@@ -16,7 +16,7 @@ const GeometricAvatar = ({ rank, size = "md" }: { rank: number; size?: "sm" | "m
   return (
     <div
       className={`${sizeClasses[size]} bg-secondary flex items-center justify-center`}
-      style={{ [shapes[rank] ? "" : ""]: "", clipPath: rank === 1 ? "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)" : rank === 2 ? "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)" : "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)" }}
+      style={{ clipPath: rank === 1 ? "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)" : rank === 2 ? "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)" : "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)" }}
     >
       <span className="text-muted-foreground font-bold font-['Space_Grotesk']">{rank}</span>
     </div>
