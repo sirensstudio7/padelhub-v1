@@ -107,19 +107,19 @@ export function getPlayerProfile(userId: string): PlayerProfile | null {
   };
   const socials = mockSocials[entry.id] ?? { tiktok: "", instagram: "" };
   const mockClubsJoined: Record<string, string> = {
-    "1": "Padel Hub Central",
-    "2": "Ace Club",
-    "3": "Smash Society",
+    "1": "Padel Hub Society",
+    "2": "Serve\nSide",
+    "3": "Selasa Padel",
     "4": "Court Masters",
     "5": "Racket Republic",
-    "6": "Padel Hub Central",
-    "7": "Ace Club",
-    "8": "Smash Society",
+    "6": "Padel Hub Society",
+    "7": "Serve\nSide",
+    "8": "Selasa Padel",
     "9": "Court Masters",
     "10": "Racket Republic",
-    "11": "Padel Hub Central",
-    "12": "Ace Club",
-    "13": "Smash Society",
+    "11": "Padel Hub Society",
+    "12": "Serve\nSide",
+    "13": "Selasa Padel",
     "14": "Court Masters",
     "15": "Racket Republic",
   };

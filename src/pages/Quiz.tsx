@@ -51,7 +51,7 @@ const Quiz = () => {
   }, [search, locationFilter]);
 
   return (
-    <div className="min-h-screen bg-background pb-16">
+    <div className="min-h-[100dvh] bg-background pb-16">
       <header className="sticky top-0 z-40 bg-background border-b border-border">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center shrink-0" aria-label="PadelHub home">
@@ -66,19 +66,19 @@ const Quiz = () => {
               }
             />
           </Link>
-          <button
-            type="button"
+          <Link
+            to="/notifications"
             aria-label="Notifications"
-            className="p-2 rounded-full text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+            className="p-2 rounded-full text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring transition-colors rounded-full"
           >
             <HugeiconsIcon icon={Notification01Icon} size={24} color="currentColor" strokeWidth={1.5} />
-          </button>
+          </Link>
         </div>
       </header>
 
       <div className="max-w-lg mx-auto mt-4">
         <div className="px-4 py-4">
-          <h1 className="text-6xl font-bold tracking-widest text-foreground font-['Space_Grotesk']">
+          <h1 className="text-3xl font-bold tracking-widest text-foreground font-['Space_Grotesk'] whitespace-nowrap">
             Player
           </h1>
           <p className="text-sm text-muted-foreground mt-1">Browse and find players</p>

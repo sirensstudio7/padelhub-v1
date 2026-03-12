@@ -46,7 +46,7 @@ const ClubIndex = () => {
   }, [search, locationFilter]);
 
   return (
-    <div className="min-h-screen bg-background pb-16">
+    <div className="min-h-[100dvh] bg-background pb-16">
       <header className="sticky top-0 z-40 bg-background border-b border-border">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center shrink-0" aria-label="PadelHub home">
@@ -61,20 +61,20 @@ const ClubIndex = () => {
               }
             />
           </Link>
-          <button
-            type="button"
+          <Link
+            to="/notifications"
             aria-label="Notifications"
-            className="p-2 rounded-full text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+            className="p-2 rounded-full text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring transition-colors rounded-full"
           >
             <HugeiconsIcon icon={Notification01Icon} size={24} color="currentColor" strokeWidth={1.5} />
-          </button>
+          </Link>
         </div>
       </header>
 
       <div className="max-w-lg mx-auto mt-4">
         <RevealSection className="px-4 py-4">
-          <h1 className="text-6xl font-bold tracking-widest text-foreground font-['Space_Grotesk']">
-            Club<br />index
+          <h1 className="text-3xl font-bold tracking-widest text-foreground font-['Space_Grotesk'] whitespace-nowrap">
+            Club index
           </h1>
           <p className="text-sm text-muted-foreground mt-1">You can explore and find clubs</p>
         </RevealSection>
@@ -140,15 +140,14 @@ const ClubIndex = () => {
           </div>
         </RevealSection>
 
-        <div className="overflow-x-auto pb-8 -mx-4 px-4">
-          <RevealSection stagger staggerDelay={0.06} className="flex gap-3 w-max min-w-full pl-4 pr-4">
+        <RevealSection stagger staggerDelay={0.06} className="grid grid-cols-2 gap-3 px-4 pb-8">
             {filteredClubs.map((club) => (
               <Link
                 key={club.id}
                 to={`/library/${club.id}`}
-                className="flex flex-col rounded-2xl border border-border bg-card overflow-hidden shadow-sm shrink-0 w-[280px] transition-colors hover:border-primary/50 hover:bg-muted/30"
+                className="flex flex-col rounded-2xl border border-border bg-card overflow-hidden shadow-sm min-w-0 transition-colors hover:border-primary/50 hover:bg-muted/30"
               >
-                <div className="aspect-[3/2] bg-muted relative overflow-hidden">
+                <div className="aspect-[4/3] bg-muted relative overflow-hidden min-h-[140px]">
                   <SafeImage
                     src={club.imageUrl}
                     alt=""
@@ -174,7 +173,6 @@ const ClubIndex = () => {
               </Link>
             ))}
           </RevealSection>
-        </div>
       </div>
     </div>
   );

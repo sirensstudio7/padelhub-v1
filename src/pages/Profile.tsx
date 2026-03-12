@@ -1,5 +1,5 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowLeft02Icon,
@@ -8,13 +8,25 @@ import {
   Award01Icon,
   GemIcon,
   Location01Icon,
-  TiktokIcon,
   InstagramIcon,
+  Edit02Icon,
 } from "@hugeicons/core-free-icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet";
 import { getPlayerProfile, getCurrentUserId } from "@/data/playerProfile";
 import { getClubByName } from "@/data/mockClubs";
+import { useProfileOverrides } from "@/contexts/ProfileOverridesContext";
+import { useAuth } from "@/contexts/AuthContext";
 import SafeImage from "@/components/SafeImage";
 import RevealSection from "@/components/RevealSection";
 import NotFound from "./NotFound";
@@ -31,6 +43,14 @@ const LEVEL_REWARDS = [
 const Profile = () => {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
+  const { logout } = useAuth();
+  const { overrides, setOverrides } = useProfileOverrides();
+  const [editOpen, setEditOpen] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editPosition, setEditPosition] = useState<"left" | "right">("left");
+  const [editLocation, setEditLocation] = useState("");
+  const [editAvatarUrl, setEditAvatarUrl] = useState("");
+  const avatarFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!userId) {
@@ -40,14 +60,53 @@ const Profile = () => {
   }, [userId, navigate]);
 
   const effectiveUserId = userId ?? getCurrentUserId();
-  const profile = effectiveUserId ? getPlayerProfile(effectiveUserId) : null;
+  const baseProfile = effectiveUserId ? getPlayerProfile(effectiveUserId) : null;
+  const isSelf = effectiveUserId === getCurrentUserId();
+
+  const profile = baseProfile
+    ? {
+        ...baseProfile,
+        name: overrides.name !== undefined && overrides.name !== null ? overrides.name : baseProfile.name,
+        avatarUrl: overrides.avatarUrl !== undefined ? overrides.avatarUrl ?? baseProfile.avatarUrl : baseProfile.avatarUrl,
+        position: overrides.position !== undefined && overrides.position !== null ? overrides.position : baseProfile.position,
+        location: overrides.location !== undefined && overrides.location !== null ? overrides.location : baseProfile.location,
+        clubJoined: overrides.clubJoined !== undefined ? overrides.clubJoined ?? baseProfile.clubJoined : baseProfile.clubJoined,
+        clubLogoUrl: overrides.clubLogoUrl !== undefined ? overrides.clubLogoUrl ?? baseProfile.clubLogoUrl : baseProfile.clubLogoUrl,
+      }
+    : null;
+
+  const openEdit = () => {
+    setEditName(profile!.name);
+    setEditPosition(profile!.position ?? "left");
+    setEditLocation(profile!.location ?? "");
+    setEditAvatarUrl(profile!.avatarUrl ?? "");
+    setEditOpen(true);
+  };
+
+  const saveEdit = () => {
+    setOverrides({
+      name: editName || undefined,
+      position: editPosition,
+      location: editLocation || undefined,
+      avatarUrl: editAvatarUrl || undefined,
+    });
+    setEditOpen(false);
+  };
+
+  const onAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setEditAvatarUrl(reader.result as string);
+    reader.readAsDataURL(file);
+  };
 
   if (!profile) {
     return <NotFound />;
   }
 
   return (
-    <div className="min-h-screen bg-background pb-16">
+    <div className="min-h-[100dvh] bg-background pb-16">
       {/* Header: back left, Profile center, settings right */}
       <header className="sticky top-0 z-40 bg-background border-b border-border">
         <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between gap-2">
@@ -70,20 +129,31 @@ const Profile = () => {
             >
               <HugeiconsIcon icon={SentIcon} size={24} color="currentColor" strokeWidth={1.5} />
             </button>
-            <button
-              type="button"
-              aria-label="More options"
-              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            >
-              <HugeiconsIcon icon={MoreVerticalCircle01Icon} size={24} color="currentColor" strokeWidth={1.5} />
-            </button>
+            {isSelf ? (
+              <button
+                type="button"
+                aria-label="Edit profile"
+                onClick={openEdit}
+                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                <HugeiconsIcon icon={Edit02Icon} size={24} color="currentColor" strokeWidth={1.5} />
+              </button>
+            ) : (
+              <button
+                type="button"
+                aria-label="More options"
+                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                <HugeiconsIcon icon={MoreVerticalCircle01Icon} size={24} color="currentColor" strokeWidth={1.5} />
+              </button>
+            )}
           </div>
         </div>
       </header>
 
       <div className="max-w-lg mx-auto px-4 py-6 flex flex-col gap-6">
         <RevealSection>
-        <div className="rounded-xl border border-border bg-black p-4 flex flex-col gap-6 text-white">
+        <div className="rounded-xl border border-border bg-[#232323] p-4 flex flex-col gap-6 text-white">
           <div className="flex items-start gap-4">
             <Avatar className="h-20 w-20 shrink-0 rounded-full overflow-hidden border-2 border-white/30 bg-white/10">
               {profile.avatarUrl && (
@@ -97,7 +167,8 @@ const Profile = () => {
             <h2 className="text-xl font-bold text-white font-['Space_Grotesk'] truncate">
               {profile.name}
             </h2>
-            <div className="flex items-center gap-1.5 mt-[4px] text-white/70">
+            <div className="flex items-center gap-2 mt-[4px] text-white/70">
+              <span className="text-xs font-['Space_Grotesk'] shrink-0">Position</span>
               <span className="text-sm font-medium tracking-wide capitalize">
                 {profile.position ? `${profile.position} side` : "—"}
               </span>
@@ -229,14 +300,19 @@ const Profile = () => {
                   href={`https://tiktok.com/${profile.tiktok.replace(/^@/, "")}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group rounded-2xl border border-border bg-card p-4 flex items-center gap-3 hover:bg-black hover:border-black hover:text-white transition-colors min-h-[72px]"
+                  className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3 min-h-[72px]"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0 group-hover:bg-white/20">
-                    <HugeiconsIcon icon={TiktokIcon} size={20} color="currentColor" strokeWidth={1.5} />
+                  <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0 overflow-hidden">
+                    <SafeImage
+                      src="/reclub.png"
+                      alt="Reclub"
+                      className="w-6 h-6 object-contain"
+                      fallback={<span className="text-sm font-bold text-muted-foreground">R</span>}
+                    />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground group-hover:text-white/70 font-['Space_Grotesk']">TikTok</p>
-                    <p className="text-sm font-semibold text-foreground group-hover:text-white font-['Space_Grotesk'] truncate">{profile.tiktok}</p>
+                    <p className="text-xs text-muted-foreground font-['Space_Grotesk']">Reclub</p>
+                    <p className="text-sm font-semibold text-foreground font-['Space_Grotesk'] truncate">{profile.tiktok}</p>
                   </div>
                 </a>
               )}
@@ -245,14 +321,14 @@ const Profile = () => {
                   href={`https://instagram.com/${profile.instagram.replace(/^@/, "")}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group rounded-2xl border border-border bg-card p-4 flex items-center gap-3 hover:bg-black hover:border-black hover:text-white transition-colors min-h-[72px]"
+                  className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3 min-h-[72px]"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0 group-hover:bg-white/20">
+                  <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
                     <HugeiconsIcon icon={InstagramIcon} size={20} color="currentColor" strokeWidth={1.5} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground group-hover:text-white/70 font-['Space_Grotesk']">Instagram</p>
-                    <p className="text-sm font-semibold text-foreground group-hover:text-white font-['Space_Grotesk'] truncate">{profile.instagram}</p>
+                    <p className="text-xs text-muted-foreground font-['Space_Grotesk']">Instagram</p>
+                    <p className="text-sm font-semibold text-foreground font-['Space_Grotesk'] truncate">{profile.instagram}</p>
                   </div>
                 </a>
               )}
@@ -319,7 +395,108 @@ const Profile = () => {
           </TabsContent>
         </Tabs>
         </RevealSection>
+
+        {isSelf && (
+          <div className="pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full rounded-xl font-['Space_Grotesk'] text-muted-foreground border-border hover:bg-destructive/10 hover:text-destructive hover:border-destructive"
+              onClick={() => {
+                logout();
+                navigate("/login", { replace: true });
+              }}
+            >
+              Log out
+            </Button>
+          </div>
+        )}
       </div>
+
+      <Sheet open={editOpen} onOpenChange={setEditOpen}>
+        <SheetContent side="bottom" className="rounded-t-2xl max-h-[85dvh] overflow-y-auto font-['Space_Grotesk']">
+          <SheetHeader>
+            <SheetTitle>Edit profile</SheetTitle>
+          </SheetHeader>
+          <div className="flex flex-col gap-4 py-4">
+            <div className="flex flex-col items-center gap-3">
+              <div className="relative">
+                <Avatar className="h-24 w-24 rounded-full overflow-hidden border-2 border-border">
+                  {editAvatarUrl ? (
+                    <img src={editAvatarUrl} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <AvatarFallback className="text-2xl bg-muted text-foreground">
+                      {editName.charAt(0) || "?"}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <input
+                  ref={avatarFileRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  aria-label="Upload profile photo"
+                  onChange={onAvatarFileChange}
+                />
+              </div>
+              <div className="flex gap-2 w-full max-w-xs">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 rounded-xl"
+                  onClick={() => avatarFileRef.current?.click()}
+                >
+                  Upload photo
+                </Button>
+              </div>
+              <div className="w-full max-w-xs space-y-1.5">
+                <Label className="text-muted-foreground">Or photo URL</Label>
+                <Input
+                  placeholder="https://..."
+                  value={editAvatarUrl}
+                  onChange={(e) => setEditAvatarUrl(e.target.value)}
+                  className="rounded-xl"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Name</Label>
+              <Input
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="Your name"
+                className="rounded-xl"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Position</Label>
+              <select
+                value={editPosition}
+                onChange={(e) => setEditPosition(e.target.value as "left" | "right")}
+                className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <option value="left">Left side</option>
+                <option value="right">Right side</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label>Location</Label>
+              <Input
+                value={editLocation}
+                onChange={(e) => setEditLocation(e.target.value)}
+                placeholder="City or region"
+                className="rounded-xl"
+              />
+            </div>
+          </div>
+          <SheetFooter className="mt-4">
+            <Button type="button" onClick={saveEdit} className="rounded-xl w-full sm:w-auto">
+              Save changes
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

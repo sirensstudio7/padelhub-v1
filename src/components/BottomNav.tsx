@@ -3,21 +3,21 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ClipboardIcon, TennisRacketIcon, Calendar03Icon } from "@hugeicons/core-free-icons";
 import { getCurrentUserId } from "@/data/playerProfile";
 import { getPlayerProfile } from "@/data/playerProfile";
+import { useProfileOverrides } from "@/contexts/ProfileOverridesContext";
 import SafeImage from "@/components/SafeImage";
 import "./BottomNav.css";
 
 const BottomNav = () => {
   const { pathname } = useLocation();
-  const hideNav =
-    pathname.startsWith("/profile") ||
-    /^\/library\/[^/]+$/.test(pathname) || // club detail: /library/:clubId
-    /^\/library\/[^/]+\/members$/.test(pathname); // club members: /library/:clubId/members
+  const { overrides } = useProfileOverrides();
+  const hideNav = false; // nav visible on all main app routes (profile, club detail, club members)
   if (hideNav) return null;
 
   const currentUserId = getCurrentUserId();
   const currentProfile = currentUserId ? getPlayerProfile(currentUserId) : null;
-  const avatarUrl = currentProfile?.avatarUrl;
-  const fallbackInitial = currentProfile?.name?.charAt(0) ?? "?";
+  const avatarUrl = overrides.avatarUrl !== undefined ? overrides.avatarUrl ?? undefined : currentProfile?.avatarUrl;
+  const displayName = overrides.name !== undefined && overrides.name !== null ? overrides.name : currentProfile?.name;
+  const fallbackInitial = displayName?.charAt(0) ?? "?";
   return (
     <div className="bottom-nav">
       <nav className="tab-bar">

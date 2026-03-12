@@ -76,7 +76,7 @@ const PodiumCard = ({
           </span>
         </div>
         <div className="mt-auto flex flex-col items-center gap-1.5 text-center">
-          <span className={`${nameSizeClass} font-['Space_Grotesk'] font-medium line-clamp-2 px-1 text-foreground`}>
+          <span className={`${nameSizeClass} font-['Space_Grotesk'] font-medium line-clamp-2 px-1 text-foreground whitespace-pre-line`}>
             {displayName ?? entry.name}
           </span>
           <span className={`${pointsSizeClass} font-bold text-primary font-['Space_Grotesk']`}>
@@ -155,7 +155,7 @@ const ClubPodiumCard = ({
           </span>
         </div>
         <div className="mt-auto flex flex-col items-center gap-1.5 text-center">
-          <span className={`${nameSizeClass} font-['Space_Grotesk'] font-medium line-clamp-2 px-1 text-foreground`}>
+          <span className={`${nameSizeClass} font-['Space_Grotesk'] font-medium line-clamp-2 px-1 text-foreground whitespace-pre-line`}>
             {club.name}
           </span>
           <span className={`${pointsSizeClass} font-bold text-primary font-['Space_Grotesk']`}>
@@ -248,7 +248,7 @@ const Podium = ({ topThree, topThreeClubs, activeTab, onTabChange }: PodiumProps
           </div>
           <div className="flex items-center justify-start gap-2 flex-wrap -mt-4">
             <span className="title-line block text-[72px] leading-none shrink-0 italic">HUB</span>
-            <span className="title-line block italic text-[48px] leading-none shrink-0 font-bold">Ranking</span>
+            <span className="title-line block italic text-[40px] leading-none shrink-0 font-bold">Ranking</span>
           </div>
         </h2>
         <div className="flex flex-wrap rounded-full bg-[#015f4d] p-1 mt-2 w-full box-border border border-[#015f4d] font-['Space_Grotesk'] text-sm">
