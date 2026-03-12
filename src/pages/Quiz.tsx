@@ -78,8 +78,8 @@ const Quiz = () => {
 
       <div className="max-w-lg mx-auto mt-4">
         <div className="px-4 py-4">
-          <h1 className="text-3xl font-bold tracking-widest text-foreground font-['Space_Grotesk'] whitespace-nowrap">
-            Player
+          <h1 className="text-3xl font-bold text-foreground font-['Space_Grotesk'] whitespace-nowrap">
+            Player index
           </h1>
           <p className="text-sm text-muted-foreground mt-1">Browse and find players</p>
         </div>

@@ -73,7 +73,7 @@ const ClubIndex = () => {
 
       <div className="max-w-lg mx-auto mt-4">
         <RevealSection className="px-4 py-4">
-          <h1 className="text-3xl font-bold tracking-widest text-foreground font-['Space_Grotesk'] whitespace-nowrap">
+          <h1 className="text-3xl font-bold text-foreground font-['Space_Grotesk'] whitespace-nowrap">
             Club index
           </h1>
           <p className="text-sm text-muted-foreground mt-1">You can explore and find clubs</p>
