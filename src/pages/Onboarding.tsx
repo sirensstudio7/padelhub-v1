@@ -4,13 +4,10 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { useAuth } from "@/contexts/AuthContext";
 
-const UNSPLASH = (id: string) =>
-  `https://images.unsplash.com/photo-${id}?w=1920&q=80&auto=format&fit=crop`;
-
 const PAGES = [
-  { title: "Your Padel Journey\nBegins Here", image: UNSPLASH("1770230901556-4e1c0bacfb09") },
-  { title: "Clubs &\nLeaderboards", image: UNSPLASH("1743456110628-6508997cf730") },
-  { title: "Ready to\nPlay", image: UNSPLASH("1686721134997-a43d7de8de1a") },
+  { title: "Where Competitive Padel Players & Clubs Build Their Legacy", image: "/g-1.jpeg" },
+  { title: "Rank. Connect.\nCompete.", image: "/g-2.jpeg" },
+  { title: "The Home of Competitive Padel\nPlayers & Clubs.", image: "/g-3.jpeg" },
 ];
 
 const Onboarding = () => {
@@ -60,7 +57,7 @@ const Onboarding = () => {
         </span>
 
         {/* Main heading */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground font-['Space_Grotesk'] text-center leading-tight max-w-[320px] mb-8 whitespace-pre-line">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground font-['Space_Grotesk'] text-center leading-tight max-w-[320px] mb-8 whitespace-pre-line">
           {page.title}
         </h1>
 
