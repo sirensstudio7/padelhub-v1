@@ -3,7 +3,9 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft02Icon, SentIcon, Calendar03Icon, Location01Icon } from "@hugeicons/core-free-icons";
 import { getEventById, formatEventDate, formatEventTime } from "@/data/events";
 import SafeImage from "@/components/SafeImage";
+import EventBracket from "@/components/EventBracket";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NotFound from "./NotFound";
 
 const EventDetail = () => {
@@ -75,14 +77,24 @@ const EventDetail = () => {
             </div>
           </div>
 
-          {event.description && (
-            <div className="pt-2 border-t border-border">
-              <h3 className="text-sm font-semibold text-foreground font-['Space_Grotesk'] mb-2">About this event</h3>
-              <p className="text-sm text-muted-foreground font-['Space_Grotesk'] leading-relaxed">
-                {event.description}
-              </p>
-            </div>
-          )}
+          <Tabs defaultValue="details" className="w-full">
+            <TabsList className="w-full grid grid-cols-2 font-['Space_Grotesk']">
+              <TabsTrigger value="details">Details</TabsTrigger>
+              <TabsTrigger value="bracket">Bracket</TabsTrigger>
+            </TabsList>
+            <TabsContent value="details" className="mt-3">
+              {event.description ? (
+                <p className="text-sm text-muted-foreground font-['Space_Grotesk'] leading-relaxed">
+                  {event.description}
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground font-['Space_Grotesk']">No details available.</p>
+              )}
+            </TabsContent>
+            <TabsContent value="bracket" className="mt-3">
+              <EventBracket />
+            </TabsContent>
+          </Tabs>
 
           <Button
             asChild
