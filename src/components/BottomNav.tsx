@@ -1,8 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ClipboardIcon, TennisRacketIcon, Calendar03Icon } from "@hugeicons/core-free-icons";
-import { getCurrentUserId } from "@/data/playerProfile";
-import { getPlayerProfile } from "@/data/playerProfile";
+import { getCurrentPlayerDisplayName, getCurrentUserId, getPlayerProfile } from "@/data/playerProfile";
 import { useProfileOverrides } from "@/contexts/ProfileOverridesContext";
 import SafeImage from "@/components/SafeImage";
 import "./BottomNav.css";
@@ -16,7 +15,7 @@ const BottomNav = () => {
   const currentUserId = getCurrentUserId();
   const currentProfile = currentUserId ? getPlayerProfile(currentUserId) : null;
   const avatarUrl = overrides.avatarUrl !== undefined ? overrides.avatarUrl ?? undefined : currentProfile?.avatarUrl;
-  const displayName = overrides.name !== undefined && overrides.name !== null ? overrides.name : currentProfile?.name;
+  const displayName = getCurrentPlayerDisplayName() ?? currentProfile?.name;
   const fallbackInitial = displayName?.charAt(0) ?? "?";
   return (
     <div className="bottom-nav">

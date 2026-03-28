@@ -1,8 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Notification01Icon } from "@hugeicons/core-free-icons";
 import Podium from "@/components/Podium";
+import { NotificationBellLink } from "@/components/NotificationBellLink";
 import LeaderboardRow from "@/components/LeaderboardRow";
 import SafeImage from "@/components/SafeImage";
 import RevealSection from "@/components/RevealSection";
@@ -64,13 +63,7 @@ const Index = () => {
               }
             />
           </Link>
-          <Link
-            to="/notifications"
-            aria-label="Notifications"
-            className="p-2 rounded-full text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring transition-colors rounded-full"
-          >
-            <HugeiconsIcon icon={Notification01Icon} size={24} color="currentColor" strokeWidth={1.5} />
-          </Link>
+          <NotificationBellLink />
         </div>
       </header>
 

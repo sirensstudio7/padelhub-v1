@@ -6,10 +6,13 @@ export interface Event {
   location: string;
   venue: string;
   type?: "tournament" | "clinic" | "social" | "league";
+  /** Shown for tournaments: how many teams will play (free text, e.g. "16" or "8 teams"). */
+  teamsCount?: string;
   imageUrl?: string;
   description?: string;
 }
 
+/** Seed events (bundled). Custom events from admin are stored in localStorage and merged via `getAllEvents`. */
 export const upcomingEvents: Event[] = [
   {
     id: "1",
@@ -64,9 +67,109 @@ export const upcomingEvents: Event[] = [
   },
 ];
 
-export function getEventById(id: string): Event | null {
-  return upcomingEvents.find((e) => e.id === id) ?? null;
+const CUSTOM_EVENTS_KEY = "padelhub_custom_events";
+
+function readCustomEvents(): Event[] {
+  try {
+    const raw = localStorage.getItem(CUSTOM_EVENTS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (e): e is Event =>
+        e != null &&
+        typeof e === "object" &&
+        typeof (e as Event).id === "string" &&
+        typeof (e as Event).title === "string" &&
+        typeof (e as Event).date === "string" &&
+        typeof (e as Event).location === "string" &&
+        typeof (e as Event).venue === "string"
+    );
+  } catch {
+    return [];
+  }
 }
+
+export function getAllEvents(): Event[] {
+  return [...upcomingEvents, ...readCustomEvents()];
+}
+
+function localDateString(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+/** True if the event date/time is before now (local). */
+export function isEventPast(e: Event): boolean {
+  const today = localDateString(new Date());
+  if (e.date < today) return true;
+  if (e.date > today) return false;
+  if (!e.time) return false;
+  const [hh, mm] = e.time.split(":").map((x) => parseInt(x, 10));
+  const start = new Date(`${e.date}T12:00:00`);
+  start.setHours(hh || 0, mm || 0, 0, 0);
+  return start.getTime() < Date.now();
+}
+
+export function getPastEventsSorted(events: Event[]): Event[] {
+  return events
+    .filter(isEventPast)
+    .sort((a, b) => {
+      const byDate = b.date.localeCompare(a.date);
+      if (byDate !== 0) return byDate;
+      return a.title.localeCompare(b.title);
+    });
+}
+
+/** Today or future by date/time; soonest first (public + custom). */
+export function getUpcomingEventsSorted(events: Event[]): Event[] {
+  return events
+    .filter((e) => !isEventPast(e))
+    .sort((a, b) => {
+      const byDate = a.date.localeCompare(b.date);
+      if (byDate !== 0) return byDate;
+      return a.title.localeCompare(b.title);
+    });
+}
+
+export function getEventById(id: string): Event | null {
+  return getAllEvents().find((e) => e.id === id) ?? null;
+}
+
+function writeCustomEvents(events: Event[]): void {
+  try {
+    localStorage.setItem(CUSTOM_EVENTS_KEY, JSON.stringify(events));
+  } catch {
+    /* quota */
+  }
+  window.dispatchEvent(new CustomEvent("padelhub-events-changed"));
+}
+
+export function isCustomEventId(id: string): boolean {
+  return readCustomEvents().some((e) => e.id === id);
+}
+
+export function addCustomEvent(event: Event): void {
+  writeCustomEvents([...readCustomEvents(), event]);
+}
+
+export function updateCustomEvent(updated: Event): void {
+  const all = readCustomEvents();
+  const idx = all.findIndex((e) => e.id === updated.id);
+  if (idx === -1) return;
+  const next = [...all];
+  next[idx] = updated;
+  writeCustomEvents(next);
+}
+
+export const EVENT_TYPES: { value: NonNullable<Event["type"]>; label: string }[] = [
+  { value: "tournament", label: "Tournament" },
+  { value: "clinic", label: "Clinic" },
+  { value: "social", label: "Social" },
+  { value: "league", label: "League" },
+];
 
 export function formatEventDate(dateStr: string): string {
   const d = new Date(dateStr + "T12:00:00");

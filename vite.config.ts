@@ -18,7 +18,8 @@ export default defineConfig(() => ({
       includeAssets: ["favicon.ico"],
       workbox: {
         navigateFallback: "/index.html",
-        navigateFallbackDenylist: [/^\/~oauth/],
+        // Admin is browser/desktop-first; avoid SPA offline shell for /admin/*
+        navigateFallbackDenylist: [/^\/~oauth/, /^\/admin/],
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
       },
       manifest: {

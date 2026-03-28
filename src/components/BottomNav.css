@@ -204,3 +204,21 @@
 .tab-bar a {
   text-decoration: none;
 }
+
+/* Club nav: five icon slots, no home/chart pseudo-elements */
+.club-bottom-nav .tab-bar--club {
+  max-width: 420px;
+  padding: 10px 14px 14px 14px;
+  gap: 2px;
+}
+
+.tab-bar a.club-nav-item::before,
+.tab-bar a.club-nav-item::after {
+  content: none !important;
+  display: none !important;
+}
+
+.tab-bar a.club-nav-item svg {
+  stroke: currentColor;
+  fill: none;
+}

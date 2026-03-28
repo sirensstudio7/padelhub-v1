@@ -11,6 +11,8 @@ export type Notification = {
   inviteTarget?: string;
   /** For event: short event description. */
   eventTitle?: string;
+  /** Deep link for app-generated event rows (e.g. tournament registration). */
+  eventId?: string;
   /** e.g. "Thursday 4:20pm" */
   timestamp: string;
   /** e.g. "2 hours ago" */

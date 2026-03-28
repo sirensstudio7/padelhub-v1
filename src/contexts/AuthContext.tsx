@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { ACCOUNT_ROLE_STORAGE_KEY } from "@/lib/accountRole";
 
 const AUTH_KEY = "padelhub_logged_in";
 const ONBOARDING_KEY = "padelhub_onboarding_done";
@@ -44,6 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoggedIn(false);
     try {
       localStorage.removeItem(AUTH_KEY);
+      localStorage.removeItem(ACCOUNT_ROLE_STORAGE_KEY);
     } catch {}
   }, []);
 

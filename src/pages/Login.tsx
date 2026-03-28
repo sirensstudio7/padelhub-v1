@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { DEMO_MEMBER_ACCOUNTS, validateDemoMemberLogin } from "@/data/demoMemberAccounts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import SafeImage from "@/components/SafeImage";
-
-const DEMO_ACCOUNT = { email: "hi@padel.com", password: "testing" };
 
 const Login = () => {
   const navigate = useNavigate();
@@ -23,8 +22,7 @@ const Login = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    const emailTrim = email.trim().toLowerCase();
-    if (emailTrim === DEMO_ACCOUNT.email && password === DEMO_ACCOUNT.password) {
+    if (validateDemoMemberLogin(email, password)) {
       login();
       navigate("/", { replace: true });
     } else {
@@ -50,11 +48,14 @@ const Login = () => {
           </Link>
         </div>
 
+        <p className="text-xs font-semibold uppercase tracking-wider text-primary font-['Space_Grotesk'] mb-2">
+          Member
+        </p>
         <h1 className="text-2xl font-bold text-foreground font-['Space_Grotesk'] tracking-tight mb-1">
-          Welcome back
+          Sign in
         </h1>
         <p className="text-sm text-muted-foreground font-['Space_Grotesk'] mb-6">
-          Sign in to your account to continue
+          Use your member email and password for the app.
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -97,9 +98,24 @@ const Login = () => {
             type="submit"
             className="w-full h-11 rounded-xl font-['Space_Grotesk'] font-semibold mt-2"
           >
-            Log in
+            Sign in as member
           </Button>
         </form>
+
+        <details className="mt-6 rounded-xl border border-border bg-muted/30 px-4 py-3 text-left">
+          <summary className="cursor-pointer text-xs font-medium text-muted-foreground font-['Space_Grotesk']">
+            Demo accounts (local / staging)
+          </summary>
+          <ul className="mt-3 space-y-2 text-xs text-muted-foreground font-['Space_Grotesk']">
+            {DEMO_MEMBER_ACCOUNTS.map((a) => (
+              <li key={a.email} className="break-all">
+                <span className="text-foreground">{a.email}</span>
+                <span className="mx-1.5 text-border">·</span>
+                <span className="tabular-nums">{a.password}</span>
+              </li>
+            ))}
+          </ul>
+        </details>
 
         <p className="text-center text-sm text-muted-foreground font-['Space_Grotesk'] mt-6">
           Don&apos;t have an account?{" "}

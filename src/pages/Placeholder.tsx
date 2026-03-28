@@ -1,14 +1,11 @@
 import { useLocation, Link } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Notification01Icon, Calendar03Icon, Location01Icon } from "@hugeicons/core-free-icons";
+import { Calendar03Icon, Location01Icon } from "@hugeicons/core-free-icons";
+import { NotificationBellLink } from "@/components/NotificationBellLink";
 import RevealSection from "@/components/RevealSection";
 import SafeImage from "@/components/SafeImage";
-import {
-  upcomingEvents,
-  formatEventDate,
-  formatEventTime,
-  type Event,
-} from "@/data/events";
+import { formatEventDate, formatEventTime, type Event } from "@/data/events";
+import { useEventsList } from "@/hooks/useEventsList";
 
 const EventCard = ({ event }: { event: Event }) => (
   <Link
@@ -53,7 +50,9 @@ const EventCard = ({ event }: { event: Event }) => (
   </Link>
 );
 
-const EventsPage = () => (
+const EventsPage = () => {
+  const events = useEventsList();
+  return (
   <div className="min-h-[100dvh] bg-background pb-16">
     <header className="sticky top-0 z-40 bg-background border-b border-border">
       <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
@@ -69,13 +68,7 @@ const EventsPage = () => (
             }
           />
         </Link>
-        <Link
-          to="/notifications"
-          aria-label="Notifications"
-          className="p-2 rounded-full text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
-        >
-          <HugeiconsIcon icon={Notification01Icon} size={24} color="currentColor" strokeWidth={1.5} />
-        </Link>
+        <NotificationBellLink />
       </div>
     </header>
 
@@ -90,13 +83,14 @@ const EventsPage = () => (
       </RevealSection>
 
       <RevealSection stagger staggerDelay={0.05} className="flex flex-col gap-4 px-4 pb-8">
-        {upcomingEvents.map((event) => (
+        {events.map((event) => (
           <EventCard key={event.id} event={event} />
         ))}
       </RevealSection>
     </div>
   </div>
-);
+  );
+};
 
 const Placeholder = () => {
   const location = useLocation();

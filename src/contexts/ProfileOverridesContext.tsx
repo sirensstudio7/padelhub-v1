@@ -1,6 +1,7 @@
-import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 
-const STORAGE_KEY = "padelhub_profile_overrides";
+/** @see getCurrentPlayerDisplayName — same key for profile name override */
+export const PROFILE_OVERRIDES_STORAGE_KEY = "padelhub_profile_overrides";
 
 export type ProfileOverrides = {
   avatarUrl?: string | null;
@@ -9,11 +10,16 @@ export type ProfileOverrides = {
   location?: string | null;
   clubJoined?: string | null;
   clubLogoUrl?: string | null;
+  /** Club signup: primary contact / owner (distinct from venue `name`). */
+  clubOwnerName?: string | null;
+  clubSocialInstagram?: string | null;
+  clubSocialFacebook?: string | null;
+  clubSocialWebsite?: string | null;
 };
 
 const loadOverrides = (): ProfileOverrides => {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(PROFILE_OVERRIDES_STORAGE_KEY);
     if (!raw) return {};
     const parsed = JSON.parse(raw) as Record<string, unknown>;
     return {
@@ -23,6 +29,10 @@ const loadOverrides = (): ProfileOverrides => {
       location: parsed.location as string | null | undefined,
       clubJoined: parsed.clubJoined as string | null | undefined,
       clubLogoUrl: parsed.clubLogoUrl as string | null | undefined,
+      clubOwnerName: parsed.clubOwnerName as string | null | undefined,
+      clubSocialInstagram: parsed.clubSocialInstagram as string | null | undefined,
+      clubSocialFacebook: parsed.clubSocialFacebook as string | null | undefined,
+      clubSocialWebsite: parsed.clubSocialWebsite as string | null | undefined,
     };
   } catch {
     return {};
@@ -31,7 +41,7 @@ const loadOverrides = (): ProfileOverrides => {
 
 const saveOverrides = (o: ProfileOverrides) => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(o));
+    localStorage.setItem(PROFILE_OVERRIDES_STORAGE_KEY, JSON.stringify(o));
   } catch {}
 };
 
@@ -45,6 +55,15 @@ const ProfileOverridesContext = createContext<ContextValue | null>(null);
 
 export const ProfileOverridesProvider = ({ children }: { children: ReactNode }) => {
   const [overrides, setOverridesState] = useState<ProfileOverrides>(loadOverrides);
+
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== PROFILE_OVERRIDES_STORAGE_KEY) return;
+      setOverridesState(loadOverrides());
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   const setOverrides = useCallback((updates: Partial<ProfileOverrides>) => {
     setOverridesState((prev) => {

@@ -16,6 +16,11 @@ export function getClubByName(name: string): Club | null {
   return mockClubs.find((c) => c.name === name) ?? null;
 }
 
+/** Demo club count (replace with API when available). */
+export function getRegisteredClubCount(): number {
+  return mockClubs.length;
+}
+
 export const mockClubs: Club[] = [
   { id: "1", name: "Padel Hub Society", memberCount: 124, location: "Downtown", imageUrl: "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=80&h=80&fit=crop", description: "Premier padel facility in the heart of the city. Open daily with coaching and social events.", courts: 6 },
   { id: "2", name: "Serve\nSide", memberCount: 89, location: "North Side", imageUrl: "https://images.unsplash.com/photo-1622163642998-1ee2a1d2a5f2?w=80&h=80&fit=crop", description: "Friendly club with a focus on leagues and tournaments.", courts: 4 },

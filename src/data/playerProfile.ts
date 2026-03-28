@@ -1,3 +1,4 @@
+import { PROFILE_OVERRIDES_STORAGE_KEY } from "@/contexts/ProfileOverridesContext";
 import { mockLeaderboard } from "./mockLeaderboard";
 import type { LeaderboardEntry } from "./mockLeaderboard";
 import { mockClubs } from "./mockClubs";
@@ -25,6 +26,30 @@ export function getClubRanking(): ClubRankingEntry[] {
 export function getCurrentUserId(): string | null {
   const current = mockLeaderboard.find((e) => e.isCurrentUser);
   return current?.id ?? null;
+}
+
+export function getStoredProfileNameOverride(): string | null {
+  try {
+    const raw = localStorage.getItem(PROFILE_OVERRIDES_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { name?: unknown };
+    const n = parsed.name;
+    return typeof n === "string" && n.trim() ? n.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Display name for the logged-in member: profile override (e.g. after event registration) first,
+ * then the mock leaderboard row marked `isCurrentUser` (Olivia Brown in demo data).
+ */
+export function getCurrentPlayerDisplayName(): string | null {
+  const fromOverride = getStoredProfileNameOverride();
+  if (fromOverride) return fromOverride;
+  const entry = mockLeaderboard.find((e) => e.isCurrentUser);
+  const n = entry?.name?.trim();
+  return n || null;
 }
 
 export interface PlayerProfile {

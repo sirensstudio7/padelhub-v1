@@ -23,7 +23,7 @@ import {
   SheetTitle,
   SheetFooter,
 } from "@/components/ui/sheet";
-import { getPlayerProfile, getCurrentUserId } from "@/data/playerProfile";
+import { getPlayerProfile, getCurrentUserId, getCurrentPlayerDisplayName } from "@/data/playerProfile";
 import { getClubByName } from "@/data/mockClubs";
 import { useProfileOverrides } from "@/contexts/ProfileOverridesContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -66,12 +66,32 @@ const Profile = () => {
   const profile = baseProfile
     ? {
         ...baseProfile,
-        name: overrides.name !== undefined && overrides.name !== null ? overrides.name : baseProfile.name,
-        avatarUrl: overrides.avatarUrl !== undefined ? overrides.avatarUrl ?? baseProfile.avatarUrl : baseProfile.avatarUrl,
-        position: overrides.position !== undefined && overrides.position !== null ? overrides.position : baseProfile.position,
-        location: overrides.location !== undefined && overrides.location !== null ? overrides.location : baseProfile.location,
-        clubJoined: overrides.clubJoined !== undefined ? overrides.clubJoined ?? baseProfile.clubJoined : baseProfile.clubJoined,
-        clubLogoUrl: overrides.clubLogoUrl !== undefined ? overrides.clubLogoUrl ?? baseProfile.clubLogoUrl : baseProfile.clubLogoUrl,
+        name: isSelf ? (getCurrentPlayerDisplayName() ?? baseProfile.name) : baseProfile.name,
+        avatarUrl: isSelf
+          ? overrides.avatarUrl !== undefined
+            ? overrides.avatarUrl ?? baseProfile.avatarUrl
+            : baseProfile.avatarUrl
+          : baseProfile.avatarUrl,
+        position: isSelf
+          ? overrides.position !== undefined && overrides.position !== null
+            ? overrides.position
+            : baseProfile.position
+          : baseProfile.position,
+        location: isSelf
+          ? overrides.location !== undefined && overrides.location !== null
+            ? overrides.location
+            : baseProfile.location
+          : baseProfile.location,
+        clubJoined: isSelf
+          ? overrides.clubJoined !== undefined
+            ? overrides.clubJoined ?? baseProfile.clubJoined
+            : baseProfile.clubJoined
+          : baseProfile.clubJoined,
+        clubLogoUrl: isSelf
+          ? overrides.clubLogoUrl !== undefined
+            ? overrides.clubLogoUrl ?? baseProfile.clubLogoUrl
+            : baseProfile.clubLogoUrl
+          : baseProfile.clubLogoUrl,
       }
     : null;
 

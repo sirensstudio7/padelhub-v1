@@ -1,7 +1,8 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Notification01Icon, Search01Icon, FilterHorizontalIcon } from "@hugeicons/core-free-icons";
+import { Search01Icon, FilterHorizontalIcon } from "@hugeicons/core-free-icons";
+import { NotificationBellLink } from "@/components/NotificationBellLink";
 import { mockLeaderboard } from "@/data/mockLeaderboard";
 import { getPlayerProfile } from "@/data/playerProfile";
 import LeaderboardRow from "@/components/LeaderboardRow";
@@ -66,13 +67,7 @@ const Quiz = () => {
               }
             />
           </Link>
-          <Link
-            to="/notifications"
-            aria-label="Notifications"
-            className="p-2 rounded-full text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring transition-colors rounded-full"
-          >
-            <HugeiconsIcon icon={Notification01Icon} size={24} color="currentColor" strokeWidth={1.5} />
-          </Link>
+          <NotificationBellLink />
         </div>
       </header>
 

@@ -1,22 +1,34 @@
-import { useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { format, formatDistanceToNow } from "date-fns";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft02Icon, Tick02Icon, HeartAddIcon } from "@hugeicons/core-free-icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   MOCK_NOTIFICATIONS,
-  NOTIFICATION_COUNTS,
   type Notification,
   type NotificationType,
 } from "@/data/mockNotifications";
+import {
+  getRegistrationSuccessNotifications,
+  markAllRegistrationSuccessNotificationsRead,
+  type RegistrationSuccessNotification,
+} from "@/data/registrationNotifications";
 
-const FILTERS: { key: "viewAll" | "events" | "followers" | "invites"; label: string; count: number }[] = [
-  { key: "viewAll", label: "View all", count: NOTIFICATION_COUNTS.viewAll },
-  { key: "events", label: "Events", count: NOTIFICATION_COUNTS.events },
-  { key: "followers", label: "Followers", count: NOTIFICATION_COUNTS.followers },
-  { key: "invites", label: "Invites", count: NOTIFICATION_COUNTS.invites },
-];
+function registrationToNotification(r: RegistrationSuccessNotification): Notification {
+  const d = new Date(r.createdAt);
+  return {
+    id: `reg-${r.id}`,
+    type: "event",
+    username: "padelhub",
+    eventTitle: `Application received — “${r.eventTitle}” (pending organizer approval)`,
+    eventId: r.eventId,
+    timestamp: format(d, "MMM d, yyyy · h:mm a"),
+    timeAgo: formatDistanceToNow(d, { addSuffix: true }),
+    unread: !r.read,
+  };
+}
 
 const getActionText = (n: Notification): string => {
   switch (n.type) {
@@ -49,13 +61,49 @@ const filterByTab = (notifications: Notification[], activeFilter: string): Notif
 const Notifications = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<"viewAll" | "events" | "followers" | "invites">("viewAll");
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
+  const [mockNotifications, setMockNotifications] = useState(MOCK_NOTIFICATIONS);
+  const [regNotifications, setRegNotifications] = useState(() =>
+    getRegistrationSuccessNotifications().map(registrationToNotification)
+  );
+
+  useEffect(() => {
+    const sync = () => {
+      setRegNotifications(getRegistrationSuccessNotifications().map(registrationToNotification));
+    };
+    sync();
+    window.addEventListener("padelhub-registration-notifications-changed", sync);
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "padelhub_registration_notifications") sync();
+    };
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener("padelhub-registration-notifications-changed", sync);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
+
+  const notifications = useMemo(
+    () => [...regNotifications, ...mockNotifications],
+    [regNotifications, mockNotifications]
+  );
 
   const filtered = filterByTab(notifications, activeFilter);
 
   const markAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+    setMockNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+    markAllRegistrationSuccessNotificationsRead();
+    setRegNotifications(getRegistrationSuccessNotifications().map(registrationToNotification));
   };
+
+  const FILTERS: { key: "viewAll" | "events" | "followers" | "invites"; label: string; count: number }[] = useMemo(
+    () => [
+      { key: "viewAll", label: "View all", count: notifications.length },
+      { key: "events", label: "Events", count: notifications.filter((n) => n.type === "event").length },
+      { key: "followers", label: "Followers", count: notifications.filter((n) => n.type === "follow").length },
+      { key: "invites", label: "Invites", count: notifications.filter((n) => n.type === "invite").length },
+    ],
+    [notifications]
+  );
 
   return (
     <div className="min-h-[100dvh] bg-muted/40 pb-16">
@@ -153,6 +201,14 @@ const Notifications = () => {
                         <p className="mt-2 text-sm text-muted-foreground font-['Space_Grotesk'] pl-2 border-l-2 border-muted">
                           {n.commentText}
                         </p>
+                      )}
+                      {n.type === "event" && n.eventId && (
+                        <Link
+                          to={`/event/${n.eventId}`}
+                          className="mt-2 inline-block text-xs font-medium text-primary hover:underline font-['Space_Grotesk']"
+                        >
+                          View event
+                        </Link>
                       )}
                       {n.type === "invite" && (
                         <div className="flex gap-2 mt-3">
